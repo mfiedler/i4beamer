@@ -69,21 +69,25 @@
     \RequirePackage{listings,pgffor}
     % The following packages are most probably not (yet) available, so we load them conditionally
     % (and otherwise embed their implementation)
-	\let\old@lstKV@SwitchCases\lstKV@SwitchCases
-	\def\lstKV@SwitchCases#1#2#3{}
-   	\RequirePackage{lstlinebgrd}
-	\let\lstKV@SwitchCases\old@lstKV@SwitchCases
+	\@ifpackagelater{listings}{2018/09/02}{%
+		\let\old@lstKV@SwitchCases\lstKV@SwitchCases
+		\def\lstKV@SwitchCases#1#2#3{}
+		\RequirePackage{lstlinebgrd}
+		\let\lstKV@SwitchCases\old@lstKV@SwitchCases
 
-	\lst@Key{numbers}{none}{%
-		\def\lst@PlaceNumber{\lst@linebgrd}%
-		\lstKV@SwitchCases{#1}%
-		{none:\\%
-		 left:\def\lst@PlaceNumber{\llap{\normalfont
-					\lst@numberstyle{\thelstnumber}\kern\lst@numbersep}\lst@linebgrd}\\%
-		 right:\def\lst@PlaceNumber{\rlap{\normalfont
-					\kern\linewidth \kern\lst@numbersep
-					\lst@numberstyle{\thelstnumber}}\lst@linebgrd}%
-		}{\PackageError{Listings}{Numbers #1 unknown}\@ehc}}
+		\lst@Key{numbers}{none}{%
+			\def\lst@PlaceNumber{\lst@linebgrd}%
+			\lstKV@SwitchCases{#1}%
+			{none:\\%
+			 left:\def\lst@PlaceNumber{\llap{\normalfont
+						\lst@numberstyle{\thelstnumber}\kern\lst@numbersep}\lst@linebgrd}\\%
+			 right:\def\lst@PlaceNumber{\rlap{\normalfont
+						\kern\linewidth \kern\lst@numbersep
+						\lst@numberstyle{\thelstnumber}}\lst@linebgrd}%
+			}{\PackageError{Listings}{Numbers #1 unknown}\@ehc}}
+	}{%
+		\RequirePackage{lstlinebgrd}
+	}%
 
     \RequirePackage{lstautogobble}
   \fi
