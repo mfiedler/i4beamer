@@ -5,6 +5,8 @@ FIG_DIR   := fig
 
 # TikZ source files (.tikz) are stored here
 TIKZ_DIR	:= fig/tikz
+# SVG source files (.tikz) are stored here
+SVG_DIR	:= fig/svg
 
 # The output directory for temporary output to be used by pdflatex and X
 BUILD_DIR ?= build
@@ -27,6 +29,10 @@ REDIRECT	?=>/dev/null 2>/dev/null
 ERRFILT		?= $(if $(shell which rubber-info), rubber-info, grep -1 "^[\!l][\. ]")
 ERRFILT		:= grep -1 "^[\!l][\. ]"
 
+# svg images are stored in fig/svg and match *.svg. they can
+# be includegraphics'ed as PDF from fig/
+SVG_SRC	:= $(shell find $(SVG_DIR) -name "*.svg")
+SVG_PDF	:= $(addprefix $(FIG_DIR)/,$(notdir $(SVG_SRC:.svg=.pdf)))
 
 #####################################################################
 #
@@ -36,7 +42,7 @@ ERRFILT		:= grep -1 "^[\!l][\. ]"
 
 # compile a fig/tik/%.tikz file to PDF and copy the result to fig/%.pdf
 $(FIG_DIR)/%.pdf : $(TIKZ_DIR)/%.tikz $(TIKZ_DEPS)
-	@mkdir -p $(BUILD_DIR); $(TIKZ_CC)  $(REDIRECT) \
+	mkdir -p $(BUILD_DIR); $(TIKZ_CC)  $(REDIRECT) \
 	&& $(TIKZ_CC) $(REDIRECT) \
 		&& cp  $(BUILD_DIR)/$(<F:.tikz=.pdf) $@ \
     && echo "[ok]    $@" \
@@ -44,13 +50,13 @@ $(FIG_DIR)/%.pdf : $(TIKZ_DIR)/%.tikz $(TIKZ_DEPS)
 
 # convert an svg document from FIG_DIR/svg to a PDF
 $(FIG_DIR)/%.pdf : $(FIG_DIR)/svg/%.svg
-	@echo -n "        [svg-->pdf (inkscape)..." && \
+	echo -n "        [svg-->pdf (inkscape)..." && \
 	inkscape -A $@ $< $(REDIRECT) \
 		&& (echo "]" ; echo "[ok]    $@") \
 		|| (echo "]" ; echo "[ERROR] $@:")
 
 # sanitize (make printer-friendly) a PDF image in fig/
-# by conerting it to PS and back. All fonts become curves,
+# by converting it to PS and back. All fonts become curves,
 # text is no longer selectable.
 #
 # Use in case of printing problems
@@ -75,7 +81,7 @@ all: slides.pdf
 %.pdf: build/%.pdf
 	cp build/$(@F) .
 
-build/slides.pdf: slides.tex ${TIKZ_PDF}
+build/slides.pdf: slides.tex ${TIKZ_PDF} ${SVG_PDF}
 	$(TEX_CC) slides.tex
 
 .PRECIOUS: build/%.pdf
