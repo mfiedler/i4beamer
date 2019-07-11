@@ -16,7 +16,7 @@ thesisPDF:
   before_script:
     - ln -fs /usr/share/zoneinfo/Europe/Berlin /etc/localtime
     - export DEBIAN_FRONTEND=noninteractive
-    - apt-get update -qq && apt-get install -y -qq make texlive-full latexmk
+    - apt-get update -qq && apt-get install -y -qq make texlive-full latexmk inkscape
   script:
     - cat /etc/os-release
     - make
