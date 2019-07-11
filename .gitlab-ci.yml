@@ -1,0 +1,52 @@
+thesisPDF:
+  image: tianon/latex
+  script:
+    - make
+  artifacts:
+    paths:
+      - slides.pdf
+
+# Testweise mit den gängen Distributionen bauen um Inkompatibilitäten schnell
+# erkennen zu können (wird nur im master-Zweig von i4/tex/thesis ausgeführt)
+
+# Generische Regel für auf Debian basierende Distributionen
+.debianoide:
+  only:
+    - master@i4/tex/i4beamer
+  before_script:
+    - ln -fs /usr/share/zoneinfo/Europe/Berlin /etc/localtime
+    - export DEBIAN_FRONTEND=noninteractive
+    - apt-get update -qq && apt-get install -y -qq make texlive-full latexmk
+  script:
+    - cat /etc/os-release
+    - make
+  artifacts:
+    paths:
+      - slides.pdf
+
+# Latest Ubuntu LTS Release
+ubuntuLatest:
+  extends: .debianoide
+  image: ubuntu:latest
+
+# Latest (rolling) Ubuntu Release
+ubuntuRolling:
+  extends: .debianoide
+  image: ubuntu:rolling
+
+debianStable:
+  extends: .debianoide
+  image: debian:stable
+
+debianTesting:
+  extends: .debianoide
+  image: debian:testing
+
+debianOldStable:
+  extends: .debianoide
+  image: debian:oldstable
+
+# Wir halten gerne an alten Sachen fest.
+debianOldOldStable:
+  extends: .debianoide
+  image: debian:oldoldstable
