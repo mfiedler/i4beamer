@@ -27,8 +27,8 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Preview
 %
-  \usepackage[active,tightpage]{preview}
-  \PreviewEnvironment{tikzpicture}
+%  \usepackage[active,tightpage]{preview}
+%  \PreviewEnvironment{tikzpicture}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % TikZ setup
