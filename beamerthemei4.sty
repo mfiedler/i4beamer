@@ -1,0 +1,215 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% $Id: beamerthemei4.sty 54 2015-12-05 14:35:23Z wosch $
+% 
+% a beamer style for i4
+%
+% Copyright 2009 by Daniel Lohmann (dl@cs.fau.de)
+%
+% This file may be distributed and/or modified
+%
+% 1. under the LaTeX Project Public License and/or
+% 2. under the GNU Public License.
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\mode<presentation>
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% color setup 
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  \definecolor{i4red}{rgb}{0.69,0.11,0.18}
+  \definecolor{i4blue}{rgb}{0.0,0.4,0.62}
+  \definecolor{i4gray}{rgb}{0.827,0.827,0.827}
+  \definecolor{darkred}{rgb}{0.8,0,0}
+  
+  % the "example green" beamer defines in the default colortheme
+  \colorlet{beamergreen}{green!50!black}
+
+  \setbeamercolor{structure}{fg=i4blue,bg={}}
+  \setbeamercolor{section in toc}{fg=black,bg={}}
+  \setbeamercolor{subsection in toc}{fg=black,bg={}}
+  \setbeamercolor{alerted text}{fg=i4red}
+  \setbeamercolor*{palette primary}{fg=black,bg=white}
+  \setbeamercolor*{palette secondary}{fg=i4blue,bg=white}
+  \setbeamercolor*{palette tertiary}{fg=i4red,bg=white}
+  \setbeamercolor*{palette quaternary}{fg=darkred,bg=gray!5!white}
+  \setbeamercolor{titlelike}{parent=structure}
+  \setbeamercolor{itemize subitem}{fg=i4red}
+  \setbeamercolor{page number in head/foot}{fg=i4red}
+  \setbeamercolor{sidebar left}{bg={}}
+  \setbeamercolor{footline}{parent=structure}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% background image setup
+%
+% This is the real trick :-) All graphical elements of the i4-layout are just
+% in the background image. To support the "plain"-option for frames, we actually
+% need two different background images (and probably a third one for the title
+% slide, don't know yet)
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  \usebackgroundtemplate{
+    \ifbeamer@plainframe%
+      \includegraphics[width=\paperwidth]{beamerthemei4_bgplain}%
+    \else %
+      \includegraphics[width=\paperwidth]{beamerthemei4_bg}
+    \fi%
+  }
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% enumeration style and borders setup
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  \setbeamersize{sidebar width left=1.07cm}
+  \setbeamersize{text margin left=0.5em}
+  \setbeamersize{text margin right=3.5mm}
+
+	% the top-level item symbol is rendered into the sidebar 
+  \setbeamertemplate{itemize item}{\raise.5pt\hbox{\vrule width 1ex height 1ex}\hspace{0.5em}}
+  \setbeamertemplate{itemize subitem}{\raise.5pt\hbox{\vrule width 0.8ex height 0.8ex}}
+  \setbeamertemplate{itemize subsubitem}{\raise.5ex\hbox{\vrule width 1ex height 0.2ex}}
+  \setbeamertemplate{headline}[default]
+ 
+  \setlength{\labelwidth}{2em}
+  \setlength{\labelsep}{0.5em}
+  \setlength{\leftmargini}{0em}
+  \setlength{\leftmarginii}{1em}
+  \setlength{\leftmarginiii}{1em}
+
+% the above looks nice on slides, but bad in block environments; hence we override
+% beamers original block envs to modify them
+
+  % command to be installed at the begin of every block environment
+  \newcommand{\beamerblock}{
+    \setbeamertemplate{itemize item}{\raise.5pt\hbox{\vrule width 0.8ex height 0.8ex}}
+    \setbeamertemplate{itemize subitem}{\raise.5pt\hbox{\vrule width 0.6ex height 0.6ex}}
+		\setlength{\leftmargini}{1.5em}
+    \setlength{\labelsep}{0.5em}
+	}
+
+  \renewenvironment{block}[1]{%
+    \begin{actionenv}%
+			\beamerblock%
+      \def\insertblocktitle{#1}%
+      \par%
+      \usebeamertemplate{block begin}}
+    {\par%
+      \usebeamertemplate{block end}%
+    \end{actionenv}
+  }
+  \renewenvironment{alertblock}[1]{%
+    \begin{actionenv}%
+			\beamerblock%
+      \def\insertblocktitle{#1}%
+      \par%
+      \mode<presentation>{%\usebeamerfont{block}%
+        \setbeamercolor{local structure}{parent=alerted text}}%
+      \usebeamertemplate{block alerted begin}}
+    {\par%
+      \usebeamertemplate{block alerted end}%
+    \end{actionenv}
+  }
+  \renewenvironment{exampleblock}[1]{%
+    \begin{actionenv}%
+			\beamerblock%
+      \def\insertblocktitle{#1}%
+      \par%
+      \mode<presentation>{%\usebeamerfont{block}%
+        \setbeamercolor{local structure}{parent=example text}}%
+      \usebeamertemplate{block example begin}}
+    {\par%
+      \usebeamertemplate{block example end}%
+    \end{actionenv}
+  }
+
+  
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% footline definitions
+% 
+% The footline is one of the things that are heavily customizable in beamer using
+% outer themes. However, we skip (and do not support) all those fancy beamer 
+% themes here and just let beamer it render as text line. This gives us full 
+% control and easy adaptation, but some things (especially the vertical layout)
+% remain a bit hacky :-)
+%
+% To provide for more easy customization within presentations, the section
+% referencing and frame numbering can be customized (and also locally surpressed) 
+% by overwriting the macros: 
+%     \InsertFrameNumber        - default: \insertframenumber
+%     \InsertSectioning         - default: basically \insertsection -- \insertsubsection
+%                                          but with tests for emptiness  
+%
+% Note that overwriting the \insertXXX commands directly usually has not the
+% intended effect, as beamer redefines them at certain points, such as
+% while processing a \section command.
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+  % default style for frame numbers 
+  \def\InsertFrameNumber{\insertframenumber}
+  \def\InsertSectioning{%
+    \ifx\insertsection\empty\else
+      \insertsection%
+      \ifx\insertsubsection\empty\else
+        \,--\,\insertsubsection%
+      \fi
+    \fi
+  }
+  \setbeamertemplate{footline}[text line]{
+    % beamer has already set footline color/font here
+    %
+    % use raisebox to align footline with i4logo
+    \raisebox{2.5mm}{\vbox{
+      % insert a strut (invisible vertical line) to prevent line breaks
+      \rule{0mm}{3mm}
+      % here the real content starts
+      % print author and title
+      \insertshortauthor
+      \hspace{2em}
+      \insertshorttitle
+      % if a shortdate is given, print it in brackets after the title 
+      \ifx\insertshortdate\@empty
+      \else
+        ~(\insertshortdate)
+      \fi
+      \hspace{2em}
+      % print section/subsection
+      \InsertSectioning
+      % print the remaining stuff right-aligned
+      \hfill
+      % print page number
+      {
+        \usebeamercolor[fg]{page number in head/foot}\usebeamerfont{page number in head/foot}    
+        \parbox[t]{0.75cm}{\centering{\InsertFrameNumber}}
+      }%
+    }}
+  }
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% frametitle setup 
+% 
+% This is probably the most hacky part of i4beamer We completely overwrite the  
+% code beamer uses to render the frame title, especially to get the vertical
+% spacing and alignment right, so it fits with the "background".
+%
+% The i4-Layout does not really offer space for subtitles. We support them 
+% anyway by printing them right-aligned.
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+  \setbeamertemplate{frametitle}{
+    \usebeamerfont{frametitle}\usebeamercolor[fg]{frametitle}
+    \insertframetitle\strut
+    \ifx\insertframesubtitle\@empty
+    \else {%
+      \usebeamerfont{framesubtitle}\usebeamercolor[fg]{framesubtitle}
+      \hfill\insertframesubtitle\strut
+    }%
+    \fi
+    \par\vskip2pt
+  }
+
+\mode
+<all>

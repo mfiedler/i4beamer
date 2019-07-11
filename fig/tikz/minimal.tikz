@@ -1,0 +1,15 @@
+% !TEX encoding = UTF-8 Unicode
+% $Id: minimal.tikz 51 2015-06-01 13:32:57Z lohmann $
+%
+
+\begin{frame}
+\begin{tikzpicture}
+
+  % Haus vom Nikolaus, auf Folie 2 in doppelter Größe
+  \draw<1>[thick,rounded corners=8pt] (0,0) -- (0,2) -- (1,3.25) -- (2,2) -- (2,0) -- (0,2) -- (2,2) -- (0,0);
+  \path<2> [thick,draw,rounded corners=8pt, scale=2] (0,0) -- (0,2) -- (1,3.25) -- (2,2) -- (2,0) -- (0,2) -- (2,2) -- (0,0); 	
+
+  \useasboundingbox[scale=2] (0,-2.1) rectangle (2,2);
+\end{tikzpicture}
+\end{frame}
+% vim: filetype=tex

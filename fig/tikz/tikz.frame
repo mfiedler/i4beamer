@@ -1,0 +1,46 @@
+% $Id$
+%
+% vim: set fenc=utf-8 ft=latex
+% !Mode:: "TeX:UTF-8"
+% !TEX encoding = UTF-8 Unicode 
+% -*- mode: latex -*-
+% -*- coding: UTF-8 -*-
+% kate: encoding utf-8;
+%
+% IMPORTANT Note: This file is UTF-8 encoded! 
+%                 You should see some umlauts here: ÄÖÜäöü
+
+\documentclass{beamer}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Fonts
+%
+  \usepackage[T1]{fontenc}
+  \usepackage{lmodern}
+  \usepackage{charter}
+  \renewcommand{\sfdefault}{cmbr} 
+  \usepackage[scaled=0.85]{beramono}
+  \usepackage{csquotes}
+    \MakeOuterQuote{"}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Preview
+%
+  \usepackage[active,tightpage]{preview}
+  \PreviewEnvironment{tikzpicture}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% TikZ setup
+%
+  \usepackage{tikz}
+  % common settings are shared with main document 
+  \input{tikz.styles}
+
+
+\begin{document}
+
+\input{\TheTikzFile}
+
+\end{document}
+

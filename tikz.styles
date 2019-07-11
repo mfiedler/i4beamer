@@ -1,0 +1,21 @@
+% $Id$
+%
+% vim: set fenc=utf-8 ft=latex
+% !Mode:: "TeX:UTF-8"
+% !TEX encoding = UTF-8 Unicode 
+% -*- mode: latex -*-
+% -*- coding: UTF-8 -*-
+% kate: encoding utf-8;
+%
+% IMPORTANT Note: This file is UTF-8 encoded! 
+%                 You should see some umlauts here: ÄÖÜäöü
+
+% part of the preamble that is shared by .tikz figures and lectures
+% intended to define colors, TikZ styles, and so on
+% 
+
+\usetikzlibrary{positioning,spy,shapes,shapes.misc,shapes.multipart}
+
+
+
+
