@@ -69,8 +69,23 @@
     \RequirePackage{listings,pgffor}
     % The following packages are most probably not (yet) available, so we load them conditionally
     % (and otherwise embed their implementation)
-    \IfFileExists{lstlinebgrd.sty}{\RequirePackage{lstlinebgrd}}{\@btlstlinebgrdNotFoundtrue}  
-    \IfFileExists{lstautogobble.sty}{\RequirePackage{lstautogobble}}{\@btlstautogobbleNotFoundtrue}  
+	\let\old@lstKV@SwitchCases\lstKV@SwitchCases
+	\def\lstKV@SwitchCases#1#2#3{}
+   	\RequirePackage{lstlinebgrd}
+	\let\lstKV@SwitchCases\old@lstKV@SwitchCases
+
+	\lst@Key{numbers}{none}{%
+		\def\lst@PlaceNumber{\lst@linebgrd}%
+		\lstKV@SwitchCases{#1}%
+		{none:\\%
+		 left:\def\lst@PlaceNumber{\llap{\normalfont
+					\lst@numberstyle{\thelstnumber}\kern\lst@numbersep}\lst@linebgrd}\\%
+		 right:\def\lst@PlaceNumber{\rlap{\normalfont
+					\kern\linewidth \kern\lst@numbersep
+					\lst@numberstyle{\thelstnumber}}\lst@linebgrd}%
+		}{\PackageError{Listings}{Numbers #1 unknown}\@ehc}}
+
+    \RequirePackage{lstautogobble}
   \fi
   \ifbtNoTikZ\else
     \RequirePackage{tikz}
@@ -664,153 +679,6 @@
       \lstinputlisting{#3}%
    }% \only
   }
-
-  
-  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-  %% lstlinebgrd.sty
-  %% see: http://tex.stackexchange.com/questions/18969/creating-a-zebra-effect-using-listings/18989#18989
-  %%
-  %% This small package is not yet published/not commonly available.
-  %% If available, load it; otherwise embed the required stuff
-  %%
-  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-  \if@btlstlinebgrdNotFound
-  
-    % Patch line number key to call line background macro
-    \lst@Key{numbers}{none}{%
-        \def\lst@PlaceNumber{\lst@linebgrd}%
-        \lstKV@SwitchCases{#1}%
-        {none&\\%
-         left&\def\lst@PlaceNumber{\llap{\normalfont
-                    \lst@numberstyle{\thelstnumber}\kern\lst@numbersep}\lst@linebgrd}\\%
-         right&\def\lst@PlaceNumber{\rlap{\normalfont
-                    \kern\linewidth \kern\lst@numbersep
-                    \lst@numberstyle{\thelstnumber}}\lst@linebgrd}%
-        }{\PackageError{Listings}{Numbers #1 unknown}\@ehc}}
-
-    % New keys
-    \lst@Key{linebackgroundcolor}{}{%
-        \def\lst@linebgrdcolor{#1}%
-    }
-    \lst@Key{linebackgroundsep}{0pt}{%
-        \def\lst@linebgrdsep{#1}%
-    }
-    \lst@Key{linebackgroundwidth}{\linewidth}{%
-        \def\lst@linebgrdwidth{#1}%
-    }
-    \lst@Key{linebackgroundheight}{\ht\strutbox}{%
-        \def\lst@linebgrdheight{#1}%
-    }
-    \lst@Key{linebackgrounddepth}{\dp\strutbox}{%
-        \def\lst@linebgrddepth{#1}%
-    }
-    \lst@Key{linebackgroundcmd}{\color@block}{%
-        \def\lst@linebgrdcmd{#1}%
-    }
-
-    % Line Background macro
-    \newcommand{\lst@linebgrd}{%
-        \ifx\lst@linebgrdcolor\empty\else
-        \rlap{%
-            \lst@basicstyle
-            \color{-.}% By default use the opposite (`-`) of the current color (`.`) as background
-            \lst@linebgrdcolor{%
-            \kern-\dimexpr\lst@linebgrdsep\relax%
-            \lst@linebgrdcmd{\lst@linebgrdwidth}{\lst@linebgrdheight}{\lst@linebgrddepth}%
-            }%
-        }%
-        \fi
-    }
-  \fi% \ifbt@kstkinebgrdNotFound 
-
-  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-  %% lstautogobble.sty
-  %% see: http://tex.stackexchange.com/questions/19953/how-to-automatically-skip-leading-white-spaces-in-listings/21613#21613
-  %%
-  %% This small package is not yet published/not commonly available.
-  %% If available, load it; otherwise embed the required stuff
-  %%
-  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-  \if@btlstautogobbleNotFound
-    \bt@message{'lstautogobble.sty' not found, setting up internal version}
-
-    % LaTeX Package `lstautogobble`
-    % Counts the leading spaces of the first line and sets `gobble` to this number
-    % Copyright (c) 2011 by Martin Scharrer <martin@scharrer-online.de>
-    % for http://tex.stackexchange.com/questions/19953/how-to-automatically-skip-leading-white-spaces-in-listings
-    % This is free software under the LPPL v1.3c or later and was also posted under the CC BY-SA 3.0 license.
-    % \ProvidesPackage{lstautogobble}[2011/06/25 v1.0 Implements 'autogobble' option for 'listings']
-
-    % Counter for leading spaces
-    \newcount\lstag@spacecount
-
-    % Some macros for comparison:
-    \def\lstag@activespace{\lst@ProcessSpace}%  Definition of an active space
-
-    \begingroup
-    \catcode`\^^M=\active%
-    \gdef\lstag@activenl{^^M}%  Active CR (ASCII 13) character which is used as line break
-    \endgroup
-
-
-    % Define `autogobble` option as boolean (by default off)
-    \lst@Key{autogobble}{false}[t]{\lstKV@SetIf{#1}\lst@ifautogobble}
-
-    % `ungobble` option
-    \lst@Key{ungobble}{0}{\def\lst@ungobble{#1}}
-
-    % Insert required code at environment init
-    \lst@AddToHook{Init}{\lst@autogobble}
-
-    % Autogobble init macro.
-    % If the option is active and `gobble` is not set, init vars and overwrite the process macro with own definition.
-    \def\lst@autogobble{%
-        \lst@ifautogobble
-            \ifnum\lst@gobble>0\else
-                \def\lst@gobble{\lstag@gobble}%
-                \def\lstag@gobble{0}%
-                \lstag@spacecount\z@
-                \def\lstag@spaceaccu{}%
-                \let\lstag@restofline\empty
-                \let\lstag@origlstenv@Process\lstenv@Process
-                \let\lstenv@Process\lstag@countleadingspaces
-            \fi
-        \fi
-    }
-
-    % Checks if the next following character (read as argument) is a line break (as it is supposed to be)
-    % Otherwise there is some text direct after the `\begin{<env>}[<options>]` which is dropped by `listings`.
-    \def\lstag@countleadingspaces#1{%
-        \expandafter\ifx\lstag@activenl#1\relax
-            \expandafter\lstag@countleadingspaces@
-        \else
-            \def\lstag@restofline{Dummy replacement of text after begin of listing to trigger original warning message}%
-            \expandafter\lstag@countleadingspaces
-        \fi
-    }
-
-    % After the new line is found this macro counts the spaces
-    \def\lstag@countleadingspaces@#1{%
-        \ifx\lstag@activespace#1\relax
-            \advance\lstag@spacecount by \@ne
-            % Accumulate spaces (i.e. their definitions) for later re-insertion:
-            \expandafter\def\expandafter\lstag@spaceaccu\expandafter{\lstag@spaceaccu\lst@ProcessSpace}%
-            \let\next\lstag@countleadingspaces@
-        \else% Character wasn't a space
-            % Set gobble option (indirect):
-            \xdef\lstag@gobble{\the\numexpr\lstag@spacecount-\lst@ungobble\relax}%
-            % Restore original definition of process macro:
-            \global\let\lstenv@Process\lstag@origlstenv@Process
-            % Re-insert all collected material or appropriate replacement material:
-            \edef\next{\noexpand\lstenv@Process\lstag@restofline\expandafter\noexpand\lstag@activenl\expandafter\unexpanded\expandafter{\lstag@spaceaccu}\noexpand#1}%
-        \fi
-        \next
-    }
-
-  \fi% \ifbt@lstautogobbleNotFound 
-  
 
 \fi% else \ifbtNoListings
 
